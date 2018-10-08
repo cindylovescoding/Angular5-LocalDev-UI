@@ -1,0 +1,8 @@
+{
+    "ResourceId":  "/subscriptions/1402be24-4f35-4ab7-a212-2cd496ebdf14/resourcegroups/badsites/providers/Microsoft.Web/sites/highcpuscenario",
+    "Version":  "v4",
+    "Token":  "",
+    "EndTime":  "",
+    "StartTime":  "",
+    "DetectorId":  "bestpracticesuggestions"
+}
