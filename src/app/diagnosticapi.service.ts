@@ -84,8 +84,6 @@ export class DiagnosticapiService {
       headers.append('x-ms-method', method);
     }
 
-  //  headers.delete('X-Requested-With');
-    console.log(headers);
     return headers;
   }
 }
