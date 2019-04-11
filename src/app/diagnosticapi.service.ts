@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { DetectorResponse, DetectorMetaData } from 'applens-diagnostics';
+import { DetectorResponse, DetectorMetaData } from 'diagnostic-data';
 import { Http, Headers, Response } from '@angular/http';
 import { Observable } from 'rxjs';
-import { AuthService } from './auth.service';
+//import { AuthService } from './auth.service';
 import { map, catchError, share, mergeMap} from 'rxjs/operators';
 import 'rxjs/add/operator/share'
 import 'rxjs/add/operator/mergeMap'
@@ -21,7 +21,7 @@ export class DiagnosticapiService {
   private resourceId: string;
   private accessToken: string;
   private detectorId: string;
-  constructor(private _http: Http, private _authService: AuthService) { 
+  constructor(private _http: Http) { 
     this.detectorSettings = this.getJSON().share();
   }
 
@@ -39,8 +39,18 @@ export class DiagnosticapiService {
     var body;
     let timeParameters = this._getTimeQueryParameters(startTime, endTime);
     let path = `${this.version}${this.resourceId}/detectors/${detector}?${timeParameters}`;
+    console.log("**************Diagnostic service details****************");
 
-    return this.invoke<DetectorResponse>(this.accessToken, path, 'POST', body, true, refresh, internalView);
+
+      return this.detectorSettings.mergeMap(data => {
+        this.version = data.Version;
+        this.resourceId = data.ResourceId;
+        this.accessToken = data.Token;
+        let path = `${data.Version}${data.ResourceId}/detectors/${data.DetectorId}?&startTime=${data.StartTime}&endTime=${data.EndTime}`;
+        console.log(path);
+        return this.invoke<DetectorResponse>(data.Token, path, 'POST', body, true, refresh, internalView);
+      }
+      );
   }
 
   public getDetectors(): Observable<DetectorMetaData[]> {
@@ -49,7 +59,7 @@ export class DiagnosticapiService {
         this.version = data.Version;
         this.resourceId = data.ResourceId;
         this.accessToken = data.Token;
-        let path = `${data.Version}${data.ResourceId}/detectors`;
+        let path = `${data.Version}${data.ResourceId}/detectors?&startTime=${data.StartTime}&endTime=${data.EndTime}`;
         return this.invoke<DetectorResponse[]>(data.Token, path, 'POST', body).map(response => response.map(detector => detector.metadata));
       }
     )
